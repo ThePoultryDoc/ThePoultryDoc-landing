@@ -26,12 +26,6 @@
       margin-bottom: 1.5rem;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin: 0.5rem 0;
-      color: #1d3557;
-    }
-
     p.tagline {
       font-size: 1.1rem;
       color: #444;
@@ -72,18 +66,42 @@
       font-size: 0.85rem;
       color: #aaa;
     }
+
+    .success-message {
+      color: green;
+      margin-top: 1rem;
+      font-weight: bold;
+      display: none;
+    }
   </style>
+  <script>
+    function handleGoogleFormSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+      const data = new FormData(form);
+      fetch(form.action, {
+        method: "POST",
+        body: data,
+        mode: "no-cors"
+      }).then(() => {
+        document.getElementById("google-success-message").style.display = "block";
+        form.reset();
+      }).catch(() => {
+        alert("There was a problem submitting the form.");
+      });
+    }
+  </script>
 </head>
 <body>
   <div class="container">
     <img src="logo.png" alt="ThePoultryDoc.com logo" class="logo" />
-    <h1>ThePoultryDoc.com</h1>
     <p class="tagline">Bringing board-certified poultry medicine to the backyard</p>
     <p class="description">We’re hatching something special. Sign up to be the first to know when we go live.</p>
-    <form action="https://docs.google.com/forms/d/e/1FAIpQLSe6lSyCAxWHfIn9z27D9RyocjNkQ_0rkUdZCzNpmKnELa4_OA/formResponse" method="POST" target="_blank">
+    <form action="https://docs.google.com/forms/d/e/1FAIpQLSe6lSyCAxWHfIn9z27D9RyocjNkQ_0rkUdZCzNpmKnELa4_OA/formResponse" method="POST" onsubmit="handleGoogleFormSubmit(event)">
       <input type="email" name="entry.626407111" placeholder="Your email address" required /><br />
       <button type="submit">Notify Me</button>
     </form>
+    <div id="google-success-message" class="success-message">Thanks! We'll keep you in the loop 🐔</div>
     <div class="footer">© 2025 ThePoultryDoc.com | All rights reserved</div>
   </div>
 </body>
