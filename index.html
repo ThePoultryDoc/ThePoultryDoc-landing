@@ -1,7 +1,15 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-5DLV2YVSDP"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-5DLV2YVSDP');
+</script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ThePoultryDoc.com – Coming Soon</title>
@@ -75,19 +83,27 @@
     }
   </style>
   <script>
-    function handleGoogleFormSubmit(event) {
+    function handleFormSubmit(event) {
       event.preventDefault();
       const form = event.target;
       const data = new FormData(form);
+
       fetch(form.action, {
         method: "POST",
-        body: data,
-        mode: "no-cors"
-      }).then(() => {
-        document.getElementById("google-success-message").style.display = "block";
-        form.reset();
-      }).catch(() => {
+        body: data
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.result === 'success') {
+          document.getElementById("google-success-message").style.display = "block";
+          form.reset();
+        } else {
+          alert("There was a problem submitting the form.");
+        }
+      })
+      .catch(error => {
         alert("There was a problem submitting the form.");
+        console.error(error);
       });
     }
   </script>
@@ -97,10 +113,13 @@
     <img src="logo.png" alt="ThePoultryDoc.com logo" class="logo" />
     <p class="tagline">Bringing board-certified poultry medicine to the backyard</p>
     <p class="description">We’re hatching something special. Sign up to be the first to know when we go live.</p>
-    <form action="https://docs.google.com/forms/d/e/1FAIpQLSe6lSyCAxWHfIn9z27D9RyocjNkQ_0rkUdZCzNpmKnELa4_OA/formResponse" method="POST" onsubmit="handleGoogleFormSubmit(event)">
-      <input type="email" name="entry.626407111" placeholder="Your email address" required /><br />
+    
+    <https://script.google.com/a/macros/thepoultrydoc.com/s/AKfycbw2h7qhydr3AMcNd68aILFOBSp6Fm0gu4MIeOh3xHozXStZojlxbX-HLVCMYs67X_Zqbg/exec>
+    <form action="YOUR_WEB_APP_URL" method="POST" onsubmit="handleFormSubmit(event)">
+      <input type="email" name="Email" placeholder="Your email address" required /><br />
       <button type="submit">Notify Me</button>
     </form>
+
     <div id="google-success-message" class="success-message">Thanks! We'll keep you in the loop 🐔</div>
     <div class="footer">© 2025 ThePoultryDoc.com | All rights reserved</div>
   </div>
