@@ -46,13 +46,15 @@
       margin-bottom: 1.5rem;
     }
 
+    input[type="text"],
     input[type="email"] {
+      display: block;
+      margin: 0 auto 1rem auto;
       padding: 0.75rem;
       width: 90%;
       max-width: 350px;
       border-radius: 0.5rem;
       border: 1px solid #ccc;
-      margin-bottom: 1rem;
     }
 
     button {
@@ -111,13 +113,11 @@
     <p class="description">We’re hatching something special. Sign up to be the first to know when we go live.</p>
 
     <form action="https://script.google.com/macros/s/AKfycbw2h7qhydr3AMcNd68aILFOBSp6Fm0gu4MIeOh3xHozXStZojlxbX-HLVCMYs67X_Zqbg/exec" method="POST" onsubmit="handleFormSubmit(event)">
-  <input type="text" name="First Name" placeholder="First Name" required /><br />
-  <input type="text" name="Last Name" placeholder="Last Name" required /><br />
-  <input type="email" name="Email" placeholder="Your email address" required /><br />
-  <button type="submit">Notify Me</button>
-</form>
-
-
+      <input type="text" name="First Name" placeholder="First Name" required />
+      <input type="text" name="Last Name" placeholder="Last Name" required />
+      <input type="email" name="Email" placeholder="Your email address" required />
+      <button type="submit">Notify Me</button>
+    </form>
 
     <div id="google-success-message" class="success-message">Thanks! We'll keep you in the loop 🐔</div>
     <div class="footer">© 2025 ThePoultryDoc.com | All rights reserved</div>
