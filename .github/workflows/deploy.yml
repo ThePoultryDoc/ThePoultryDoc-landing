@@ -5,29 +5,41 @@ on:
     branches:
       - main  # or your default branch
 
+permissions:
+  contents: write  # This is important for deployment to GitHub Pages
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for proper deployment
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # Optional: Build steps if you have any
-      # - name: Install dependencies
-      #   run: npm ci
-      # - name: Build
-      #   run: npm run build
+      # Prepare the deployment files
+      - name: Create deployment directory
+        run: |
+          mkdir -p deploy
+          cp -r *.html *.png CNAME deploy/
+          # Add any other files you want to deploy
+          # Make sure not to include turnstile-worker
 
+      # Configure Git
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      # Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          branch: gh-pages  # The branch the action should deploy to
-          folder: .         # The folder the action should deploy
-          clean: true       # Automatically remove deleted files from the deployment
-          clean-exclude: |
-            turnstile-worker/**
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./deploy
+          force_orphan: true  # Creates a new orphan branch, solving worktree issues
