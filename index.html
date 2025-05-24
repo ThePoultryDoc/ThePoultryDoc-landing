@@ -10,6 +10,9 @@
     gtag('config', 'G-5DLV2YVSDP');
   </script>
 
+  <!-- Cloudflare Turnstile script -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ThePoultryDoc.com – Coming Soon</title>
@@ -86,25 +89,50 @@
   </style>
   <script>
     function handleFormSubmit(event) {
-      event.preventDefault();
-      const form = event.target;
-      const data = new FormData(form);
+    event.preventDefault();
+    const form = event.target;
+    const data = new FormData(form);
 
-      fetch(form.action, {
-        method: "POST",
-        mode: "no-cors",  // prevent CORS errors
-        body: data
-      })
-      .then(() => {
-        document.getElementById("google-success-message").style.display = "block";
-        form.reset();
-      })
-      .catch(error => {
-        alert("There was a problem submitting the form.");
-        console.error(error);
-      });
-    }
-  </script>
+    // Show loading state
+    const submitButton = form.querySelector('button[type="submit"]');
+    const originalButtonText = submitButton.textContent;
+    submitButton.textContent = "Submitting...";
+    submitButton.disabled = true;
+
+    // Hide previous messages
+    document.getElementById("google-success-message").style.display = "none";
+    document.getElementById("error-message").style.display = "none";
+
+    // Send to your Cloudflare worker instead of directly to Google
+    fetch("https://turnstile-worker.grayson-ad1.workers.dev", {
+    method: "POST",
+    body: data
+  })
+    .then(response => response.json())
+    .then(result => {
+    if (result.success) {
+    document.getElementById("google-success-message").style.display = "block";
+    form.reset();
+  } else {
+    document.getElementById("error-message").textContent = result.error || "Submission failed. Please try again.";
+    document.getElementById("error-message").style.display = "block";
+  }
+  })
+    .catch(error => {
+    document.getElementById("error-message").textContent = "There was a problem submitting the form.";
+    document.getElementById("error-message").style.display = "block";
+    console.error(error);
+  })
+    .finally(() => {
+    // Reset button state
+    submitButton.textContent = originalButtonText;
+    submitButton.disabled = false;
+
+    // Refresh the Turnstile widget
+    turnstile.reset();
+  });
+  }
+</script>
 </head>
 <body>
   <div class="container">
@@ -112,10 +140,15 @@
     <p class="tagline">Bringing board-certified poultry medicine to the backyard</p>
     <p class="description">We’re hatching something special. Sign up to be the first to know when we go live.</p>
 
-    <form action="https://script.google.com/macros/s/AKfycbyScW0299vnJ53jEqqlZLYyo7u9_vZxbV4Dx4LgNk_Hun8bMfpt-w-Uh0F3y9i_f3qsMw/exec" method="POST" onsubmit="handleFormSubmit(event)">
-      <input type="text" name="First Name" placeholder="First Name" required />
+    <form action="#" method="POST" onsubmit="handleFormSubmit(event)">
+
+    <input type="text" name="First Name" placeholder="First Name" required />
       <input type="text" name="Last Name" placeholder="Last Name" required />
       <input type="email" name="Email" placeholder="Your email address" required />
+
+      <!-- Invisible Turnstile widget -->
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAABee5-hJ7K2QW-ke" data-size="invisible"></div>
+
       <button type="submit">Notify Me</button>
     </form>
 
