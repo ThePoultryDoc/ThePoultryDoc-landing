@@ -86,74 +86,83 @@
       font-weight: bold;
       display: none;
     }
+
+    .error-message {
+      color: red;
+      margin-top: 1rem;
+      font-weight: bold;
+      display: none;
+    }
   </style>
   <script>
     function handleFormSubmit(event) {
-    event.preventDefault();
-    const form = event.target;
-    const data = new FormData(form);
+      event.preventDefault();
+      const form = event.target;
+      const data = new FormData(form);
 
-    // Show loading state
-    const submitButton = form.querySelector('button[type="submit"]');
-    const originalButtonText = submitButton.textContent;
-    submitButton.textContent = "Submitting...";
-    submitButton.disabled = true;
+      // Show loading state
+      const submitButton = form.querySelector('button[type="submit"]');
+      const originalButtonText = submitButton.textContent;
+      submitButton.textContent = "Submitting...";
+      submitButton.disabled = true;
 
-    // Hide previous messages
-    document.getElementById("google-success-message").style.display = "none";
-    document.getElementById("error-message").style.display = "none";
+      // Hide previous messages
+      document.getElementById("google-success-message").style.display = "none";
+      document.getElementById("error-message").style.display = "none";
 
-    // Send to your Cloudflare worker instead of directly to Google
-    fetch("https://turnstile-worker.grayson-ad1.workers.dev", {
-    method: "POST",
-    body: data
-  })
-    .then(response => response.json())
-    .then(result => {
-    if (result.success) {
-    document.getElementById("google-success-message").style.display = "block";
-    form.reset();
-  } else {
-    document.getElementById("error-message").textContent = result.error || "Submission failed. Please try again.";
-    document.getElementById("error-message").style.display = "block";
-  }
-  })
-    .catch(error => {
-    document.getElementById("error-message").textContent = "There was a problem submitting the form.";
-    document.getElementById("error-message").style.display = "block";
-    console.error(error);
-  })
-    .finally(() => {
-    // Reset button state
-    submitButton.textContent = originalButtonText;
-    submitButton.disabled = false;
+      // Send to your Cloudflare worker instead of directly to Google
+      fetch("https://turnstile-worker.grayson-ad1.workers.dev", {
+        method: "POST",
+        body: data
+      })
+              .then(response => response.json())
+              .then(result => {
+                if (result.success) {
+                  document.getElementById("google-success-message").style.display = "block";
+                  form.reset();
+                } else {
+                  document.getElementById("error-message").textContent = result.error || "Submission failed. Please try again.";
+                  document.getElementById("error-message").style.display = "block";
+                }
+              })
+              .catch(error => {
+                document.getElementById("error-message").textContent = "There was a problem submitting the form.";
+                document.getElementById("error-message").style.display = "block";
+                console.error(error);
+              })
+              .finally(() => {
+                // Reset button state
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
 
-    // Refresh the Turnstile widget
-    turnstile.reset();
-  });
-  }
-</script>
+                // Refresh the Turnstile widget
+                if (typeof turnstile !== 'undefined') {
+                  turnstile.reset();
+                }
+              });
+    }
+  </script>
 </head>
 <body>
-  <div class="container">
-    <img src="https://thepoultrydoc.github.io/ThePoultryDoc-landing/TPD-logo-email.png?v=2" alt="The PoultryDoc Logo" class="logo" />
-    <p class="tagline">Bringing board-certified poultry medicine to the backyard</p>
-    <p class="description">We’re hatching something special. Sign up to be the first to know when we go live.</p>
+<div class="container">
+  <img src="https://thepoultrydoc.github.io/ThePoultryDoc-landing/TPD-logo-email.png?v=2" alt="The PoultryDoc Logo" class="logo" />
+  <p class="tagline">Bringing board-certified poultry medicine to the backyard</p>
+  <p class="description">We're hatching something special. Sign up to be the first to know when we go live.</p>
 
-    <form action="#" method="POST" onsubmit="handleFormSubmit(event)">
-
+  <form action="#" method="POST" onsubmit="handleFormSubmit(event)">
     <input type="text" name="First Name" placeholder="First Name" required />
-      <input type="text" name="Last Name" placeholder="Last Name" required />
-      <input type="email" name="Email" placeholder="Your email address" required />
+    <input type="text" name="Last Name" placeholder="Last Name" required />
+    <input type="email" name="Email" placeholder="Your email address" required />
 
-      <!-- Invisible Turnstile widget -->
-      <div class="cf-turnstile" data-sitekey="0x4AAAAAABee5-hJ7K2QW-ke" data-size="invisible"></div>
+    <!-- Invisible Turnstile widget -->
+    <div class="cf-turnstile" data-sitekey="0x4AAAAAABee5-hJ7K2QW-ke" data-size="invisible"></div>
 
-      <button type="submit">Notify Me</button>
-    </form>
+    <button type="submit">Notify Me</button>
+  </form>
 
-    <div id="google-success-message" class="success-message">Thanks! We'll keep you in the loop 🐔</div>
-    <div class="footer">© 2025 ThePoultryDoc Incorporated | All rights reserved</div>
-  </div>
+  <div id="google-success-message" class="success-message">Thanks! We'll keep you in the loop 🐔</div>
+  <div id="error-message" class="error-message">There was a problem submitting the form.</div>
+  <div class="footer">© 2025 ThePoultryDoc Incorporated | All rights reserved</div>
+</div>
 </body>
 </html>
