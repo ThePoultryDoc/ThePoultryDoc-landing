@@ -102,13 +102,23 @@
 
       // Show loading state
       const submitButton = form.querySelector('button[type="submit"]');
-      const originalButtonText = submitButton.textContent;
-      submitButton.textContent = "Submitting...";
-      submitButton.disabled = true;
+      if (submitButton) {
+        const originalButtonText = submitButton.textContent;
+        submitButton.textContent = "Submitting...";
+        submitButton.disabled = true;
+      }
 
-      // Hide previous messages
-      document.getElementById("google-success-message").style.display = "none";
-      document.getElementById("error-message").style.display = "none";
+      // Safely access elements with null checks
+      const successMessage = document.getElementById("google-success-message");
+      const errorMessage = document.getElementById("error-message");
+
+      // Hide previous messages if they exist
+      if (successMessage) {
+        successMessage.style.display = "none";
+      }
+      if (errorMessage) {
+        errorMessage.style.display = "none";
+      }
 
       // Send to your Cloudflare worker instead of directly to Google
       fetch("https://turnstile-worker.grayson-ad1.workers.dev", {
@@ -118,24 +128,32 @@
               .then(response => response.json())
               .then(result => {
                 if (result.success) {
-                  document.getElementById("google-success-message").style.display = "block";
+                  if (successMessage) {
+                    successMessage.style.display = "block";
+                  }
                   form.reset();
                 } else {
-                  document.getElementById("error-message").textContent = result.error || "Submission failed. Please try again.";
-                  document.getElementById("error-message").style.display = "block";
+                  if (errorMessage) {
+                    errorMessage.textContent = result.error || "Submission failed. Please try again.";
+                    errorMessage.style.display = "block";
+                  }
                 }
               })
               .catch(error => {
-                document.getElementById("error-message").textContent = "There was a problem submitting the form.";
-                document.getElementById("error-message").style.display = "block";
+                if (errorMessage) {
+                  errorMessage.textContent = "There was a problem submitting the form.";
+                  errorMessage.style.display = "block";
+                }
                 console.error(error);
               })
               .finally(() => {
                 // Reset button state
-                submitButton.textContent = originalButtonText;
-                submitButton.disabled = false;
+                if (submitButton) {
+                  submitButton.textContent = originalButtonText || "Notify Me";
+                  submitButton.disabled = false;
+                }
 
-                // Refresh the Turnstile widget
+                // Refresh the Turnstile widget if it exists
                 if (typeof turnstile !== 'undefined') {
                   turnstile.reset();
                 }
