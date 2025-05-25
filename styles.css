@@ -10,6 +10,10 @@ body {
 
 /* Layout containers */
 header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 3rem; /* adjust based on what's inside */
     margin-bottom: 1rem;
 }
 
@@ -36,9 +40,19 @@ p.tagline {
     font-size: 1.1rem;
     color: #444;
     padding-top: 0.5rem;
-    margin-bottom: 1rem;
+    margin: 0 auto 1rem auto;
     min-height: 2.5rem;
-    display: block;
+    max-width: 90vw;
+    line-height: 1.5;
+}
+
+.tagline {
+    font-size: 1.1rem;
+    color: #444;
+    padding-top: 0.5rem;
+    margin: 0 auto 1rem auto;
+    min-height: 2.5rem;
+    max-width: 90vw;
     line-height: 1.5;
 }
 
