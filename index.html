@@ -102,8 +102,11 @@
 
       // Show loading state
       const submitButton = form.querySelector('button[type="submit"]');
+      // Declare originalButtonText outside the if block so it's available in the finally block
+      let originalButtonText = "Notify Me"; // Default value
+
       if (submitButton) {
-        const originalButtonText = submitButton.textContent;
+        originalButtonText = submitButton.textContent; // Save the original text
         submitButton.textContent = "Submitting...";
         submitButton.disabled = true;
       }
@@ -120,7 +123,7 @@
         errorMessage.style.display = "none";
       }
 
-      // Send to your Cloudflare worker instead of directly to Google
+      // Send to your Cloudflare worker
       fetch("https://turnstile-worker.grayson-ad1.workers.dev", {
         method: "POST",
         body: data
@@ -149,7 +152,7 @@
               .finally(() => {
                 // Reset button state
                 if (submitButton) {
-                  submitButton.textContent = originalButtonText || "Notify Me";
+                  submitButton.textContent = originalButtonText; // Now it's accessible here
                   submitButton.disabled = false;
                 }
 
