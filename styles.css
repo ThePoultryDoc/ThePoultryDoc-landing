@@ -25,7 +25,11 @@ img.logo {
 p.tagline {
     font-size: 1.1rem;
     color: #444;
+    padding-top: 0.5rem;
     margin-bottom: 1rem;
+    min-height: 2.5rem; /* enough space for 1–2 lines */
+    display: block;
+    line-height: 1.5;
 }
 
 p.description {
