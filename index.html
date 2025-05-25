@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Poultry Doc | Backyard Chicken Vet Help & Support</title>
+  <meta name="description" content="Get help with backyard poultry care from licensed veterinarians. Sign up to be notified when we go live." />
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Meta for social sharing -->
+  <meta property="og:title" content="The Poultry Doc | Backyard Chicken Vet Help & Support" />
+  <meta property="og:description" content="Get trusted vet-reviewed help for your backyard chickens." />
+  <meta property="og:image" content="https://thepoultrydoc.com/logo.png" />
+  <meta property="og:url" content="https://thepoultrydoc.com/" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="The Poultry Doc | Backyard Chicken Vet Help & Support" />
+  <meta name="twitter:description" content="AI + Vets for healthier backyard flocks." />
+  <meta name="twitter:image" content="https://thepoultrydoc.com/logo.png" />
+
+  <!-- Turnstile + GTM -->
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <!-- Google Tag Manager -->
+  <script>
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id=GTM-54QZQDN7';f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-54QZQDN7');
+  </script>
+</head>
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript>
+  <iframe src="https://www.googletagmanager.com/ns.html?id=GTM-54QZQDN7"
+          height="0" width="0" style="display:none;visibility:hidden"></iframe>
+</noscript>
+<div class="page-wrapper">
+  <header>
+    <img src="https://thepoultrydoc.github.io/ThePoultryDoc-landing/TPD-logo-email.png?v=2" alt="The PoultryDoc Logo" class="logo" />
+  </header>
+
+  <main>
+    <p class="tagline">Bringing board-certified poultry medicine to the backyard</p>
+    <p class="description">We're hatching something special. Sign up to be the first to know when we go live.</p>
+
+    <form onsubmit="handleFormSubmit(event)">
+      <input type="text" name="First Name" placeholder="First Name" required />
+      <input type="text" name="Last Name" placeholder="Last Name" required />
+      <input type="email" name="Email" placeholder="Your email address" required />
+      <div class="cf-turnstile" data-sitekey="0x4AAAAAABee5-hJ7K2QW-ke" data-size="invisible"></div>
+      <button type="submit">Notify Me</button>
+    </form>
+
+    <div id="google-success-message" class="success-message" role="alert"></div>
+    <div id="error-message" class="error-message" role="alert"></div>
+  </main>
+
+  <footer>
+    © 2025 ThePoultryDoc Incorporated | All rights reserved
+  </footer>
+</div>
+
+<script>
+  async function hashEmail(email) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(email.trim().toLowerCase());
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  async function handleFormSubmit(event) {
+    event.preventDefault();
+    const form = event.target;
+    const data = new FormData(form);
+
+    const button = form.querySelector('button');
+    const originalText = button.textContent;
+    button.textContent = 'Submitting...';
+    button.disabled = true;
+
+    document.getElementById('google-success-message').style.display = 'none';
+    document.getElementById('error-message').style.display = 'none';
+
+    fetch('https://captcha.thepoultrydoc.com', {
+      method: 'POST',
+      body: data
+    })
+            .then(res => res.json())
+            .then(async result => {
+              if (result.success) {
+                document.getElementById('google-success-message').textContent = "Thanks! We'll keep you in the loop 🐔";
+                document.getElementById('google-success-message').style.display = 'block';
+
+                const firstName = data.get("First Name") || "";
+                const email = data.get("Email") || "";
+                const emailHash = await hashEmail(email);
+
+                window.dataLayer.push({
+                  event: 'form_submission',
+                  form_name: 'newsletter_signup',
+                  submission_status: 'success',
+                  user_data: {
+                    first_name: firstName,
+                    email_hash: emailHash
+                  }
+                });
+
+                form.reset();
+              } else {
+                throw new Error(result.error || 'Verification failed');
+              }
+            })
+            .catch(error => {
+              document.getElementById('error-message').textContent = error.message;
+              document.getElementById('error-message').style.display = 'block';
+
+              window.dataLayer.push({
+                event: 'form_submission',
+                form_name: 'newsletter_signup',
+                submission_status: 'error',
+                error_message: error.message
+              });
+            })
+            .finally(() => {
+              button.textContent = originalText;
+              button.disabled = false;
+              if (typeof turnstile !== 'undefined') turnstile.reset();
+            });
+  }
+</script>
+</body>
+</html>
